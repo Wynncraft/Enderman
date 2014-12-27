@@ -130,7 +130,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         ArrayList<Server> roomServers = new ArrayList<>();
 
         for (Server server : servers) {
-            if (server.getPort() == 0) {
+            if (server.getPort() == 0 || server.getUpdated_at().getTime() == 0L) {
                 continue;
             }
             if (plugin.getProxy().getServerInfo(server.getId().toString()) != null) {
