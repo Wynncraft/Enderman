@@ -46,25 +46,6 @@ public class ReconnectHandler extends AbstractReconnectHandler {
 
     }
 
-    public ServerInfo getSimilarServer(ProxiedPlayer player, ServerInfo serverInfo) {
-        if (serverInfo == null) {
-            return getDefault(player);
-        }
-        Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(new ObjectId(serverInfo.getName()));
-        if (server == null) {
-            return null;
-        }
-        ServerType serverType = server.getServerType();
-        if (serverType == null) {
-            return null;
-        }
-        server = getServerWithRoom(plugin, serverType.getId());
-        if (server != null) {
-            return plugin.getProxy().getServerInfo(server.getId().toString());
-        }
-        return null;
-    }
-
     private ServerInfo getDefault(ProxiedPlayer proxiedPlayer) {
         String defaultServer = proxiedPlayer.getPendingConnection().getListener().getDefaultServer();
         Server server = getServerWithRoom(plugin, new ObjectId(defaultServer));
@@ -90,6 +71,10 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         }
 
         Server server = getServerWithRoom(plugin, new ObjectId(forced));
+
+        if (server == null) {
+            return null;
+        }
 
         return plugin.getProxy().getServerInfo(server.getId().toString());
     }

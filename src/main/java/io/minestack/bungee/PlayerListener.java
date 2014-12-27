@@ -54,7 +54,7 @@ public class PlayerListener implements Listener {
             return;
         }
         plugin.getLogger().info("Server Kick");
-        ServerInfo newServer = ((ReconnectHandler)plugin.getProxy().getReconnectHandler()).getSimilarServer(event.getPlayer(), event.getKickedFrom());
+        ServerInfo newServer = ((ReconnectHandler)plugin.getProxy().getReconnectHandler()).getStoredServer(event.getPlayer());
         if (newServer != null) {
             event.getPlayer().sendMessage(event.getKickReasonComponent());
         } else {
