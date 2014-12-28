@@ -7,11 +7,15 @@ import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubPublisher;
 import io.minestack.doublechest.model.bungee.Bungee;
+import io.minestack.doublechest.model.server.Server;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +28,9 @@ public class Enderman extends Plugin {
     public Bungee getMinestackBungee() {
         return DoubleChest.INSTANCE.getMongoDatabase().getBungeeRepository().getModel(new ObjectId(System.getenv("bungee_id")));
     }
+
+    private ServerStartSubscriber serverStartSubscriber;
+    private ServerStopSubscriber serverStopSubscriber;
 
     @Override
     public void onEnable() {
@@ -79,6 +86,13 @@ public class Enderman extends Plugin {
             getProxy().getServers().clear();
             getProxy().setReconnectHandler(new ReconnectHandler(this));
 
+            try {
+                serverStartSubscriber = new ServerStartSubscriber(this);
+                serverStopSubscriber = new ServerStopSubscriber(this);
+            } catch (IOException e) {
+                getLogger().log(Level.SEVERE, "Threw a UnknownHostException in Enderman::onEnable, full stack trace follows: ", e);
+            }
+
             new PlayerListener(this);
 
             getProxy().getScheduler().schedule(this, () -> {
@@ -131,6 +145,36 @@ public class Enderman extends Plugin {
                         getLogger().log(Level.SEVERE, "Threw a IOException in Enderman::onEnable::asyncTask, full stack trace follows: ", e);
                     }
                 }
+
+                List<ServerInfo> toRemove = new ArrayList<>();
+
+                for (ServerInfo serverInfo : getProxy().getServers().values()) {
+                    Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(new ObjectId(serverInfo.getName()));
+                    if (server == null || server.getUpdated_at().getTime() == 0L) {
+                        toRemove.add(serverInfo);
+                    }
+                }
+
+                for (ServerInfo serverInfo : toRemove) {
+                    Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(new ObjectId(serverInfo.getName()));
+                    for (ProxiedPlayer player : serverInfo.getPlayers()) {
+                        player.connect(((ReconnectHandler) getProxy().getReconnectHandler()).getStoredServer(player));
+                    }
+                    if (server != null) {
+                        if (server.getServerType() != null) {
+                            getLogger().info("Removing Server " + server.getServerType().getName() + " from subscriber");
+                        }
+                    }
+                    getProxy().getServers().remove(serverInfo.getName());
+                }
+
+                DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(getMinestackBungee().getNetwork())
+                        .stream().filter(server -> getProxy().getServerInfo(server.getId().toString()) == null).forEach(server -> {
+                    if (server.getServerType() != null && server.getNode() != null) {
+                        getLogger().info("Adding Server " + server.getServerType().getName() + " from loop");
+                        getProxy().constructServerInfo(server.getId().toString(), new InetSocketAddress(server.getNode().getPrivateAddress(), server.getPort()), "", false);
+                    }
+                });
             }, 10, 10, TimeUnit.SECONDS);
         });
     }
@@ -154,6 +198,9 @@ public class Enderman extends Plugin {
         } catch (IOException e) {
             getLogger().log(Level.SEVERE, "Threw a IOException in Enderman::onDisable, full stack trace follows: ", e);
         }
+
+        serverStartSubscriber.stopSubscribing();
+        serverStopSubscriber.stopSubscribing();
     }
 
 }
