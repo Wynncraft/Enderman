@@ -1,7 +1,9 @@
-package io.minestack.bungee;
+package io.minestack.bungee.subscribers;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
+import io.minestack.bungee.Enderman;
+import io.minestack.bungee.ReconnectHandler;
 import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubSubscriber;
@@ -18,13 +20,13 @@ public class ServerStopSubscriber extends PubSubSubscriber {
     private final Enderman plugin;
 
     public ServerStopSubscriber(Enderman plugin) throws IOException {
-        super(DoubleChest.INSTANCE.getRabbitMQDatabase(), PubSubExchanges.SERVER_START.name());
+        super(DoubleChest.INSTANCE.getRabbitMQDatabase(), PubSubExchanges.SERVER_STOP.name());
         this.plugin = plugin;
     }
 
     @Override
     public void messageDelivery(String s, Envelope envelope, AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
-        JSONObject jsonObject = new JSONObject(bytes);
+        JSONObject jsonObject = new JSONObject(new String(bytes));
 
         ObjectId serverId = new ObjectId(jsonObject.getString("server"));
 
@@ -45,7 +47,7 @@ public class ServerStopSubscriber extends PubSubSubscriber {
                 player.connect(((ReconnectHandler) plugin.getProxy().getReconnectHandler()).getStoredServer(player));
             }
 
-            plugin.getLogger().info("Removing Server "+server.getServerType().getName()+" from subscriber");
+            plugin.getLogger().info("Removing Server "+server.getServerType().getName()+"."+server.getNumber()+" from subscriber");
             plugin.getProxy().getServers().remove(server.getId().toString());
         }
     }

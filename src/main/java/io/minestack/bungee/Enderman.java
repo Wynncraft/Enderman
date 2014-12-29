@@ -3,6 +3,11 @@ package io.minestack.bungee;
 
 import com.mongodb.ServerAddress;
 import com.rabbitmq.client.Address;
+import io.minestack.bungee.commands.CommandList;
+import io.minestack.bungee.commands.CommandServer;
+import io.minestack.bungee.listeners.PlayerListener;
+import io.minestack.bungee.subscribers.ServerStartSubscriber;
+import io.minestack.bungee.subscribers.ServerStopSubscriber;
 import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubPublisher;
@@ -94,6 +99,8 @@ public class Enderman extends Plugin {
             }
 
             new PlayerListener(this);
+            getProxy().getPluginManager().registerCommand(this, new CommandServer(this));
+            getProxy().getPluginManager().registerCommand(this, new CommandList(this));
 
             getProxy().getScheduler().schedule(this, () -> {
                 Bungee bungee = getMinestackBungee();
@@ -162,19 +169,31 @@ public class Enderman extends Plugin {
                     }
                     if (server != null) {
                         if (server.getServerType() != null) {
-                            getLogger().info("Removing Server " + server.getServerType().getName() + " from subscriber");
+                            getLogger().info("Removing Server " + server.getServerType().getName() + "." + server.getNumber() + " from loop");
                         }
                     }
                     getProxy().getServers().remove(serverInfo.getName());
                 }
 
-                DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(getMinestackBungee().getNetwork())
-                        .stream().filter(server -> getProxy().getServerInfo(server.getId().toString()) == null).forEach(server -> {
-                    if (server.getServerType() != null && server.getNode() != null) {
-                        getLogger().info("Adding Server " + server.getServerType().getName() + " from loop");
-                        getProxy().constructServerInfo(server.getId().toString(), new InetSocketAddress(server.getNode().getPrivateAddress(), server.getPort()), "", false);
+                for (Server server : DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(getMinestackBungee().getNetwork())) {
+                    if (server.getServerType() == null) {
+                        continue;
                     }
-                });
+                    if (server.getNode() == null) {
+                        continue;
+                    }
+                    if (server.getPort() == 0) {
+                        continue;
+                    }
+                    if (server.getUpdated_at().getTime() == 0L) {
+                        continue;
+                    }
+                    if (getProxy().getServerInfo(server.getId().toString()) == null) {
+                        getLogger().info("Adding Server " + server.getServerType().getName() + "." + server.getNumber() + " from loop");
+                        ServerInfo serverInfo = getProxy().constructServerInfo(server.getId().toString(), new InetSocketAddress(server.getNode().getPrivateAddress(), server.getPort()), "", false);
+                        getProxy().getServers().put(serverInfo.getName(), serverInfo);
+                    }
+                }
             }, 10, 10, TimeUnit.SECONDS);
         });
     }

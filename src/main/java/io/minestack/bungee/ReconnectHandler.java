@@ -37,7 +37,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
     }
 
     @Override
-    protected ServerInfo getStoredServer(ProxiedPlayer proxiedPlayer) {
+    public ServerInfo getStoredServer(ProxiedPlayer proxiedPlayer) {
         return getDefault(proxiedPlayer);
     }
 
@@ -48,7 +48,12 @@ public class ReconnectHandler extends AbstractReconnectHandler {
 
     private ServerInfo getDefault(ProxiedPlayer proxiedPlayer) {
         String defaultServer = proxiedPlayer.getPendingConnection().getListener().getDefaultServer();
-        Server server = getServerWithRoom(plugin, new ObjectId(defaultServer));
+        Server server;
+        if (proxiedPlayer.getServer() == null) {
+            server = getServerWithRoom(plugin, new ObjectId(defaultServer));
+        } else {
+            server = getServerWithRoom(plugin, new ObjectId(defaultServer), proxiedPlayer.getServer().getInfo());
+        }
         if (server == null) {
             plugin.getLogger().severe("Null server with room");
             return null;
@@ -66,7 +71,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             return null;
         }
         String forced = connection.getListener().getForcedHosts().get(connection.getVirtualHost().getHostString());
-        if (forced == null && connection.getListener().isForceDefault()) {
+        if (forced == null) {
             return null;
         }
 
@@ -120,8 +125,10 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             }
             if (plugin.getProxy().getServerInfo(server.getId().toString()) != null) {
                 if ((server.getServerType().getPlayers() - server.getPlayers()) > 0) {
-                    if (server.getId().toString().equals(lastServer.getName())) {
-                        continue;
+                    if (lastServer != null) {
+                        if (server.getId().toString().equals(lastServer.getName())) {
+                            continue;
+                        }
                     }
                     roomServers.add(server);
                 }

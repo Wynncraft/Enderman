@@ -1,11 +1,13 @@
-package io.minestack.bungee;
+package io.minestack.bungee.subscribers;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
+import io.minestack.bungee.Enderman;
 import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubSubscriber;
 import io.minestack.doublechest.model.server.Server;
+import net.md_5.bungee.api.config.ServerInfo;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
@@ -23,7 +25,7 @@ public class ServerStartSubscriber extends PubSubSubscriber {
 
     @Override
     public void messageDelivery(String s, Envelope envelope, AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
-        JSONObject jsonObject = new JSONObject(bytes);
+        JSONObject jsonObject = new JSONObject(new String(bytes));
 
         ObjectId serverId = new ObjectId(jsonObject.getString("server"));
 
@@ -47,7 +49,8 @@ public class ServerStartSubscriber extends PubSubSubscriber {
         if (plugin.getProxy().getServers().containsKey(server.getId().toString()) == true) {
             return;
         }
-        plugin.getLogger().info("Adding Server "+server.getServerType().getName()+" from subscriber");
-        plugin.getProxy().constructServerInfo(server.getId().toString(), new InetSocketAddress(server.getNode().getPrivateAddress(), server.getPort()), "", false);
+        plugin.getLogger().info("Adding Server "+server.getServerType().getName()+"."+server.getNumber()+" from subscriber");
+        ServerInfo serverInfo = plugin.getProxy().constructServerInfo(server.getId().toString(), new InetSocketAddress(server.getNode().getPrivateAddress(), server.getPort()), "", false);
+        plugin.getProxy().getServers().put(serverInfo.getName(), serverInfo);
     }
 }
