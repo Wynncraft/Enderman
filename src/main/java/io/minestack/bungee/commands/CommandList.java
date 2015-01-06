@@ -61,7 +61,9 @@ public class CommandList extends Command {
             }
         }
         sender.sendMessage(new TextComponent("Total Players on Bungee: " + plugin.getProxy().getOnlineCount()));
+        sender.sendMessage(new TextComponent("Current Bungee: "+bungee.getBungeeType().getName()+" Node: "+bungee.getNode().getName()+" Address: "+bungee.getPublicAddress().getPublicAddress()));
         sender.sendMessage(new TextComponent("Total Players on Network: "+onlineNetwork));
+        sender.sendMessage(new TextComponent("Current Network: "+bungee.getNetwork().getName()));
     }
 
 }

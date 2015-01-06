@@ -170,7 +170,11 @@ public class Enderman extends Plugin {
                     if (server != null) {
                         if (server.getServerType() != null) {
                             getLogger().info("Removing Server " + server.getServerType().getName() + "." + server.getNumber() + " from loop");
+                        } else {
+                            getLogger().info("Removing Server " + server.getId().toString() + "." + server.getNumber() + " from loop");
                         }
+                    } else {
+                        getLogger().info("Removing Server " + serverInfo.getName() + " from loop");
                     }
                     getProxy().getServers().remove(serverInfo.getName());
                 }
