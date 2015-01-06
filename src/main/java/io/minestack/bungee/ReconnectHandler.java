@@ -52,7 +52,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         if (proxiedPlayer.getServer() == null) {
             server = getServerWithRoom(plugin, new ObjectId(defaultServer));
         } else {
-            server = getServerWithRoom(plugin, new ObjectId(defaultServer), proxiedPlayer.getServer().getInfo(), 1);
+            server = getServerWithRoom(plugin, new ObjectId(defaultServer), proxiedPlayer.getServer().getInfo());
         }
         if (server == null) {
             plugin.getLogger().severe("Null server with room");
@@ -85,14 +85,10 @@ public class ReconnectHandler extends AbstractReconnectHandler {
     }
 
     public static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId) {
-        return getServerWithRoom(plugin, serverTypeId, null, 1);
+        return getServerWithRoom(plugin, serverTypeId, null);
     }
 
-    public static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId, int roomNeeded) {
-        return getServerWithRoom(plugin, serverTypeId, null, roomNeeded);
-    }
-
-    private static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId, ServerInfo lastServer, int roomNeeded) {
+    private static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId, ServerInfo lastServer) {
         ServerType serverType = DoubleChest.INSTANCE.getMongoDatabase().getServerTypeRepository().getModel(serverTypeId);
 
         if (serverType == null) {
@@ -128,7 +124,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
                 continue;
             }
             if (plugin.getProxy().getServerInfo(server.getId().toString()) != null) {
-                if ((server.getServerType().getPlayers() - server.getPlayers()) >= roomNeeded) {
+                if ((server.getServerType().getPlayers() - server.getPlayers()) > 0) {
                     if (lastServer != null) {
                         if (server.getId().toString().equals(lastServer.getName())) {
                             continue;
