@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class ServerStopSubscriber extends PubSubSubscriber {
 
@@ -28,7 +29,13 @@ public class ServerStopSubscriber extends PubSubSubscriber {
     public void messageDelivery(String s, Envelope envelope, AMQP.BasicProperties basicProperties, byte[] bytes) throws IOException {
         JSONObject jsonObject = new JSONObject(new String(bytes));
 
-        ObjectId serverId = new ObjectId(jsonObject.getString("server"));
+        ObjectId serverId = null;
+        try {
+            serverId = new ObjectId(jsonObject.getString("server"));
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Threw a Exception in ServerStopSubscriber::messageDelivery, full stack trace follows: ", e);
+            return;
+        }
 
         Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(serverId);
 

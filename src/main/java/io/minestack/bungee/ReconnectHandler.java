@@ -84,7 +84,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         return plugin.getProxy().getServerInfo(server.getId().toString());
     }
 
-    private static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId) {
+    public static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId) {
         return getServerWithRoom(plugin, serverTypeId, null);
     }
 

@@ -8,6 +8,7 @@ import io.minestack.bungee.commands.CommandServer;
 import io.minestack.bungee.listeners.PlayerListener;
 import io.minestack.bungee.subscribers.ServerStartSubscriber;
 import io.minestack.bungee.subscribers.ServerStopSubscriber;
+import io.minestack.bungee.subscribers.TeleportSubscriber;
 import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubPublisher;
@@ -36,6 +37,7 @@ public class Enderman extends Plugin {
 
     private ServerStartSubscriber serverStartSubscriber;
     private ServerStopSubscriber serverStopSubscriber;
+    private TeleportSubscriber teleportSubscriber;
 
     @Override
     public void onEnable() {
@@ -94,6 +96,7 @@ public class Enderman extends Plugin {
             try {
                 serverStartSubscriber = new ServerStartSubscriber(this);
                 serverStopSubscriber = new ServerStopSubscriber(this);
+                teleportSubscriber = new TeleportSubscriber(this);
             } catch (IOException e) {
                 getLogger().log(Level.SEVERE, "Threw a UnknownHostException in Enderman::onEnable, full stack trace follows: ", e);
             }
@@ -224,6 +227,7 @@ public class Enderman extends Plugin {
 
         serverStartSubscriber.stopSubscribing();
         serverStopSubscriber.stopSubscribing();
+        teleportSubscriber.stopSubscribing();
     }
 
 }
