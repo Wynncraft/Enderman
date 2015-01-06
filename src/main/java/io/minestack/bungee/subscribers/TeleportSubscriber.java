@@ -47,21 +47,25 @@ public class TeleportSubscriber extends PubSubSubscriber {
 
             ServerType serverType = DoubleChest.INSTANCE.getMongoDatabase().getServerTypeRepository().getModel(serverTypeId);
 
-            Server server = ReconnectHandler.getServerWithRoom(plugin, serverType.getId());
-
-            if (server == null) {
-                plugin.getLogger().warning("Could not find server from server type in teleport message");
-                return;
-            }
-
-            ServerInfo serverInfo = plugin.getProxy().getServerInfo(server.getId().toString());
-
-            if (serverInfo == null) {
-                plugin.getLogger().warning("Unknown server info from server type in teleport message");
+            if (serverType == null) {
+                plugin.getLogger().warning("Unknown server type in teleport message");
                 return;
             }
 
             if (jsonObject.has("player")) {
+                Server server = ReconnectHandler.getServerWithRoom(plugin, serverType.getId());
+
+                if (server == null) {
+                    plugin.getLogger().warning("Could not find server from server type in teleport message");
+                    return;
+                }
+
+                ServerInfo serverInfo = plugin.getProxy().getServerInfo(server.getId().toString());
+
+                if (serverInfo == null) {
+                    plugin.getLogger().warning("Unknown server info from server type in teleport message");
+                    return;
+                }
                 ProxiedPlayer player = plugin.getProxy().getPlayer(jsonObject.getString("player"));
 
                 if (player != null) {
@@ -69,6 +73,21 @@ public class TeleportSubscriber extends PubSubSubscriber {
                 }
             } else {
                 JSONArray jsonArray = jsonObject.getJSONArray("players");
+
+                Server server = ReconnectHandler.getServerWithRoom(plugin, serverType.getId(), jsonArray.length());
+
+                if (server == null) {
+                    plugin.getLogger().warning("Could not find server from server type in teleport message");
+                    return;
+                }
+
+                ServerInfo serverInfo = plugin.getProxy().getServerInfo(server.getId().toString());
+
+                if (serverInfo == null) {
+                    plugin.getLogger().warning("Unknown server info from server type in teleport message");
+                    return;
+                }
+
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String playerName = jsonArray.getString(i);
                     ProxiedPlayer player = plugin.getProxy().getPlayer(playerName);
