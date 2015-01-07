@@ -15,6 +15,7 @@ import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bson.types.ObjectId;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,17 +85,29 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             return null;
         }
 
-        if (networkForcedHost.getServerType() == null) {
-            return null;
+        if (networkForcedHost.getServerType() != null) {
+            Server server = getServerWithRoom(plugin, networkForcedHost.getServerType().getId());
+
+            if (server == null) {
+                return null;
+            }
+
+            return plugin.getProxy().getServerInfo(server.getId().toString());
         }
 
-        Server server = getServerWithRoom(plugin, networkForcedHost.getServerType().getId());
+        if (networkForcedHost.getManualServerType() != null) {
+            ServerInfo serverInfo = plugin.getProxy().getServerInfo(networkForcedHost.getManualServerType().getName());
 
-        if (server == null) {
-            return null;
+            if (serverInfo == null) {
+                serverInfo = plugin.getProxy().constructServerInfo(networkForcedHost.getManualServerType().getName(),
+                        new InetSocketAddress(networkForcedHost.getManualServerType().getAddress(), networkForcedHost.getManualServerType().getPort()), "", false);
+                plugin.getProxy().getServers().put(serverInfo.getName(), serverInfo);
+            }
+
+            return serverInfo;
         }
 
-        return plugin.getProxy().getServerInfo(server.getId().toString());
+        return null;
     }
 
     public static Server getServerWithRoom(Enderman plugin, ObjectId serverTypeId) {

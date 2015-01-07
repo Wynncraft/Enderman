@@ -84,22 +84,8 @@ public class TeleportSubscriber extends PubSubSubscriber {
                 }
             }
         } else if (jsonObject.has("server")) {
-            ObjectId serverId;
-            try {
-                serverId = new ObjectId(jsonObject.getString("server"));
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.SEVERE, "Threw a Exception in TeleportSubscriber::messageDelivery, full stack trace follows: ", e);
-                return;
-            }
 
-            Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(serverId);
-
-            if (server == null) {
-                plugin.getLogger().warning("Unknown server in teleport message");
-                return;
-            }
-
-            ServerInfo serverInfo = plugin.getProxy().getServerInfo(server.getId().toString());
+            ServerInfo serverInfo = plugin.getProxy().getServerInfo(jsonObject.getString("server"));
 
             if (serverInfo == null) {
                 plugin.getLogger().warning("Unknown server info in teleport message");
