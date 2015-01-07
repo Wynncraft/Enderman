@@ -3,6 +3,7 @@ package io.minestack.bungee;
 import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.model.bungee.Bungee;
 import io.minestack.doublechest.model.network.Network;
+import io.minestack.doublechest.model.network.NetworkForcedHost;
 import io.minestack.doublechest.model.pluginhandler.servertype.ServerType;
 import io.minestack.doublechest.model.server.Server;
 import lombok.RequiredArgsConstructor;
@@ -67,15 +68,23 @@ public class ReconnectHandler extends AbstractReconnectHandler {
 
     public static ServerInfo getForcedHost(PendingConnection connection) {
         Enderman plugin = (Enderman) ProxyServer.getInstance().getPluginManager().getPlugin("Enderman");
+        Bungee bungee = plugin.getMinestackBungee();
+        if (bungee == null) {
+            return null;
+        }
+        Network network = bungee.getNetwork();
+        if (network == null) {
+            return null;
+        }
         if (connection.getVirtualHost() == null) {
             return null;
         }
-        String forced = connection.getListener().getForcedHosts().get(connection.getVirtualHost().getHostString());
-        if (forced == null) {
+        NetworkForcedHost networkForcedHost = network.getForcedHosts().get(connection.getVirtualHost().getHostString());
+        if (networkForcedHost == null) {
             return null;
         }
 
-        Server server = getServerWithRoom(plugin, new ObjectId(forced));
+        Server server = getServerWithRoom(plugin, networkForcedHost.getServerType().getId());
 
         if (server == null) {
             return null;

@@ -61,8 +61,6 @@
                             <artifactSet>
                                 <includes>
                                     <include>io.minestack:DoubleChest:*</include>
-
-
                                 </includes>
                             </artifactSet>
                         </configuration>
