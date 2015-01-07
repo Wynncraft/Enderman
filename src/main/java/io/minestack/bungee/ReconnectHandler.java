@@ -84,6 +84,10 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             return null;
         }
 
+        if (networkForcedHost.getServerType() == null) {
+            return null;
+        }
+
         Server server = getServerWithRoom(plugin, networkForcedHost.getServerType().getId());
 
         if (server == null) {
