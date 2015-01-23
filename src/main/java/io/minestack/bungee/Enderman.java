@@ -3,6 +3,7 @@ package io.minestack.bungee;
 
 import com.mongodb.ServerAddress;
 import com.rabbitmq.client.Address;
+import io.minestack.bungee.commands.CommandGAlert;
 import io.minestack.bungee.commands.CommandList;
 import io.minestack.bungee.commands.CommandServer;
 import io.minestack.bungee.listeners.PlayerListener;
@@ -107,6 +108,7 @@ public class Enderman extends Plugin {
             new PlayerListener(this);
             getProxy().getPluginManager().registerCommand(this, new CommandServer(this));
             getProxy().getPluginManager().registerCommand(this, new CommandList(this));
+            getProxy().getPluginManager().registerCommand(this, new CommandGAlert(this));
 
             getProxy().getScheduler().schedule(this, () -> {
                 Bungee bungee = getMinestackBungee();

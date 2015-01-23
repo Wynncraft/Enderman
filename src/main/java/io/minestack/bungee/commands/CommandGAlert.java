@@ -15,7 +15,7 @@ public class CommandGAlert extends Command {
     private final Enderman plugin;
 
     public CommandGAlert(Enderman plugin) {
-        super("server", "bungeecord.command.alert");
+        super("galert", "bungeecord.command.alert");
         this.plugin = plugin;
     }
 
