@@ -26,8 +26,13 @@ public class CommandGAlert extends Command {
             return;
         }
 
+        String message = "";
+        for (String s : args) {
+            message += s+" ";
+        }
+
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("message", args[0]);
+        jsonObject.put("message", message);
 
         try {
             new GlobalMessagePublisher().publish(jsonObject);
