@@ -32,7 +32,7 @@ public class TeleportSubscriber extends PubSubSubscriber {
         JSONObject jsonObject = new JSONObject(new String(bytes));
 
         if (jsonObject.has("player") == false && jsonObject.has("players") == false) {
-            plugin.getLogger().info("No player or players in teleport message");
+            plugin.getLogger().warning("No player or players in teleport message");
             return;
         }
 
