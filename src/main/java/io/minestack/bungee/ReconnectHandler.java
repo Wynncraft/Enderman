@@ -136,7 +136,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             return null;
         }
 
-        List<Server> servers = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServerTypeServers(network, serverType);
+        List<Server> servers = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServerTypeServers(network, serverType, true);
 
         if (servers.isEmpty()) {
             plugin.getLogger().info("No servers with type of " + serverType.getName());

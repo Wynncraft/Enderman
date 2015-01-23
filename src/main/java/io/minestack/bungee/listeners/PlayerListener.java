@@ -34,7 +34,7 @@ public class PlayerListener implements Listener {
         if (bungee.getNetwork() == null) {
             return;
         }
-        List<Server> servers = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(bungee.getNetwork());
+        List<Server> servers = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(bungee.getNetwork(), true);
         int max = 0;
         int online = 0;
         for (Server server : servers) {

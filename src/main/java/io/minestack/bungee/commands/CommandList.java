@@ -37,7 +37,7 @@ public class CommandList extends Command {
         if (bungee.getNetwork() == null) {
             return;
         }
-        for (Server server : DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(bungee.getNetwork())) {
+        for (Server server : DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(bungee.getNetwork(), true)) {
             onlineNetwork += server.getPlayers();
         }
         for (ServerInfo serverInfo : ProxyServer.getInstance().getServers().values()) {
