@@ -182,7 +182,7 @@ public class Enderman extends Plugin {
                     getProxy().getServers().remove(serverInfo.getName());
                 }
 
-                for (Server server : DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(getMinestackBungee().getNetwork())) {
+                for (Server server : DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getNetworkServers(getMinestackBungee().getNetwork(), true)) {
                     if (server.getServerType() == null) {
                         continue;
                     }
