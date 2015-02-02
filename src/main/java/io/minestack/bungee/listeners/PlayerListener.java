@@ -60,7 +60,6 @@ public class PlayerListener implements Listener {
         if (newServer != null) {
             event.getPlayer().sendMessage(event.getKickReasonComponent());
         } else {
-            event.setKickReasonComponent(event.getKickReasonComponent());
             return;
         }
         plugin.getLogger().info("New Server "+newServer);
