@@ -54,13 +54,17 @@ public class CommandServer extends Command implements TabExecutor {
             } catch (Exception ex) {
                 serverName = player.getServer().getInfo().getName();
             }
-            player.sendMessage(ProxyServer.getInstance().getTranslation("current_server", serverName));
+            TextComponent serverTextComponent = new TextComponent(ProxyServer.getInstance().getTranslation("current_server", serverName));
+            serverTextComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                    new ComponentBuilder(player.getServer().getInfo().getAddress().getHostName() + ":" + player.getServer().getInfo().getAddress().getPort() + "\n")
+                            .append("Click to connect to the server").italic(true)
+                            .create()));
+            player.sendMessage(serverTextComponent);
             TextComponent serverList = new TextComponent(ProxyServer.getInstance().getTranslation("server_list"));
             serverList.setColor(ChatColor.GOLD);
             boolean first = true;
             for (ServerInfo serverInfo : servers.values()) {
                 if (serverInfo.canAccess(player)) {
-                    TextComponent serverTextComponent;
                     try {
                         Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(new ObjectId(serverInfo.getName()));
                         if (server == null) {
@@ -74,7 +78,7 @@ public class CommandServer extends Command implements TabExecutor {
                         serverTextComponent = new TextComponent(first ? serverInfo.getName() : ", " + serverInfo.getName());
                     }
                     serverTextComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new ComponentBuilder(serverInfo.getAddress().getHostName()+":"+serverInfo.getAddress().getPort()+"\n")
+                            new ComponentBuilder(serverInfo.getAddress().getHostName() + ":" + serverInfo.getAddress().getPort() + "\n")
                                     .append("Click to connect to the server").italic(true)
                                     .create()));
                     serverTextComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/server " + serverInfo.getName()));
