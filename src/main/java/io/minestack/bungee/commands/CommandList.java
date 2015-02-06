@@ -52,9 +52,9 @@ public class CommandList extends Command {
                     throw new Exception();//to break out and show the regular server format
                 }
                 if (server.getServerType() != null) {
-                    sender.sendMessage(new TextComponent(ChatColor.GREEN + "[" + server.getServerType().getName() + "." + server.getNumber() + "] "+ChatColor.GOLD+"(" + server.getPlayers() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
+                    sender.sendMessage(new TextComponent(ChatColor.GREEN + "[" + server.getServerType().getName() + "." + server.getNumber() + "] "+ChatColor.GOLD+"(" + server.getPlayers().size() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
                 } else {
-                    sender.sendMessage(new TextComponent(ChatColor.GREEN + "[NULL." + server.getNumber() + "] "+ChatColor.GOLD+"(" + server.getPlayers() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
+                    sender.sendMessage(new TextComponent(ChatColor.GREEN + "[NULL." + server.getNumber() + "] "+ChatColor.GOLD+"(" + server.getPlayers().size() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
                 }
             } catch (Exception ex) {
                 sender.sendMessage(new TextComponent(ChatColor.GREEN + "[" + serverInfo.getName() + "] (" + serverInfo.getPlayers().size() + "): " + Util.format(players, ChatColor.RESET + ", ")));
