@@ -39,7 +39,7 @@ public class PlayerListener implements Listener {
         int online = 0;
         for (Server server : servers) {
             max += server.getServerType().getPlayers();
-            online += server.getPlayers();
+            online += server.getPlayers().size();
         }
         ServerPing serverPing = new ServerPing();
         ServerPing.Players players = new ServerPing.Players(max, online, event.getResponse().getPlayers().getSample());

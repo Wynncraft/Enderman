@@ -150,7 +150,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
                 continue;
             }
             if (plugin.getProxy().getServerInfo(server.getId().toString()) != null) {
-                if ((server.getServerType().getPlayers() - server.getPlayers()) > 0) {
+                if ((server.getServerType().getPlayers() - server.getPlayers().size()) > 0) {
                     if (lastServer != null) {
                         if (server.getId().toString().equals(lastServer.getName())) {
                             continue;
