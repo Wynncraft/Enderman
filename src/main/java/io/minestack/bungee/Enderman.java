@@ -15,6 +15,7 @@ import io.minestack.doublechest.DoubleChest;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubExchanges;
 import io.minestack.doublechest.databases.rabbitmq.pubsub.PubSubPublisher;
 import io.minestack.doublechest.model.bungee.Bungee;
+import io.minestack.doublechest.model.network.NetworkManualServerType;
 import io.minestack.doublechest.model.server.Server;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -87,10 +88,17 @@ public class Enderman extends Plugin {
             }
             DoubleChest.INSTANCE.initRabbitMQDatabase(addressList, System.getenv("rabbit_username"), System.getenv("rabbit_password"));
 
-            if (getMinestackBungee() == null) {
+            Bungee myBungee = getMinestackBungee();
+            if (myBungee == null) {
                 getLogger().severe("Could not find bungee data");
                 getProxy().stop();
                 return;
+            }
+
+            for (NetworkManualServerType manualServerType : myBungee.getNetwork().getManualServerTypes().values()) {
+                ServerInfo serverInfo = getProxy().constructServerInfo(manualServerType.getName(),
+                        new InetSocketAddress(manualServerType.getAddress(), manualServerType.getPort()), "", false);
+                getProxy().getServers().put(serverInfo.getName(), serverInfo);
             }
 
             getProxy().getServers().clear();
@@ -144,7 +152,7 @@ public class Enderman extends Plugin {
 
                 boolean newBungee = false;
 
-                bungee.setUpdated_at(new Date(System.currentTimeMillis()));
+                bungee.setUpdated_at(new Date(System.currentTimeMillis()+30000));
                 DoubleChest.INSTANCE.getMongoDatabase().getBungeeRepository().saveModel(bungee);
 
                 if (newBungee == true) {
@@ -163,7 +171,13 @@ public class Enderman extends Plugin {
 
                 List<ServerInfo> toRemove = new ArrayList<>();
 
+                outer:
                 for (ServerInfo serverInfo : getProxy().getServers().values()) {
+                    for (NetworkManualServerType manualServerType : bungee.getNetwork().getManualServerTypes().values()) {
+                        if (manualServerType.getName().equals(serverInfo.getName())) {
+                            continue outer;
+                        }
+                    }
                     Server server = DoubleChest.INSTANCE.getMongoDatabase().getServerRepository().getModel(new ObjectId(serverInfo.getName()));
                     if (server == null || server.getUpdated_at().getTime() == 0L) {
                         toRemove.add(serverInfo);

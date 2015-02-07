@@ -82,6 +82,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
         }
         NetworkForcedHost networkForcedHost = network.getForcedHosts().get(connection.getVirtualHost().getHostString());
         if (networkForcedHost == null) {
+            plugin.getLogger().info("Null forced host");
             return null;
         }
 
@@ -89,9 +90,11 @@ public class ReconnectHandler extends AbstractReconnectHandler {
             Server server = getServerWithRoom(plugin, networkForcedHost.getServerType().getId());
 
             if (server == null) {
+                plugin.getLogger().info("Null forced host server");
                 return null;
             }
 
+            plugin.getLogger().info("Found server for forced host");
             return plugin.getProxy().getServerInfo(server.getId().toString());
         }
 
@@ -104,6 +107,7 @@ public class ReconnectHandler extends AbstractReconnectHandler {
                 plugin.getProxy().getServers().put(serverInfo.getName(), serverInfo);
             }
 
+            plugin.getLogger().info("Found manual server for forced host "+serverInfo.getName());
             return serverInfo;
         }
 

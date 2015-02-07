@@ -57,7 +57,7 @@ public class CommandList extends Command {
                     sender.sendMessage(new TextComponent(ChatColor.GREEN + "[NULL." + server.getNumber() + "] "+ChatColor.GOLD+"(" + server.getPlayers().size() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
                 }
             } catch (Exception ex) {
-                sender.sendMessage(new TextComponent(ChatColor.GREEN + "[" + serverInfo.getName() + "] (" + serverInfo.getPlayers().size() + "): " + Util.format(players, ChatColor.RESET + ", ")));
+                sender.sendMessage(new TextComponent(ChatColor.GREEN + "[" + serverInfo.getName() + "] (" + serverInfo.getPlayers().size() + "): "+ChatColor.RESET + Util.format(players, ChatColor.RESET + ", ")));
             }
         }
         sender.sendMessage(new TextComponent("Total Players on Bungee: " + plugin.getProxy().getOnlineCount()));
